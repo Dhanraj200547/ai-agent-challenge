@@ -4,6 +4,10 @@
 
 This Python agent automatically generates a custom parser for any bank statement PDF. It uses a self-correcting loop to generate Python code, test it against sample CSV data, and refine the parser up to 3 times. The generated parser function, `parse_pdf(pdf_path: str) -> pd.DataFrame`, returns a pandas DataFrame that exactly matches the expected CSV schema. This allows evaluators to run the agent on new bank statements without manual code changes.
 
+## Agent Architecture
+
+The agent operates in a self-correction loop. It begins by reading a sample PDF to understand its text structure and a target CSV file to understand the desired output format. It then constructs a detailed prompt, including this context, and instructs the Gemini model to generate a Python parser. Immediately after creation, the agent saves the parser and executes a test to validate that the parser's output structure (e.g., dictionary keys, return types) matches the target CSV schema. If the test fails, the agent captures the error output, adds it as feedback to the prompt, and asks the model to generate a corrected version. This cycle repeats up to three times until the test passes or the attempts are exhausted.
+
 ### Agent Diagram (Loop Description)
 
 ```
