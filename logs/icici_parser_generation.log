@@ -1,0 +1,63 @@
+
+--- Attempt 1 ---
+Generated Code:
+
+import pdfplumber
+import re
+from typing import List, Dict
+
+def parse_pdf(pdf_path: str) -> List[Dict]:
+    """
+    Parses an ICICI bank statement PDF to extract transaction data.
+
+    This parser is specifically designed to match a target CSV format where
+    the Debit and Credit columns are empty, and the transaction amount is
+    part of the description field.
+
+    Args:
+        pdf_path: The file path to the PDF bank statement.
+
+    Returns:
+        A list of dictionaries, where each dictionary represents a
+        transaction with keys matching the target CSV schema.
+    """
+    transactions = []
+    # Regex to capture three groups:
+    # 1. Date (dd-mm-yyyy) at the beginning of the line.
+    # 2. The entire middle section as a single "Description" string.
+    # 3. The final numeric value on the line as the "Balance".
+    # This pattern specifically ignores the Debit/Credit columns as per instructions.
+    transaction_pattern = re.compile(r"^(\d{2}-\d{2}-\d{4})\s+(.*?)\s+(-?[\d,.]+)$")
+
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text()
+            if not text:
+                continue
+
+            lines = text.split('\n')
+            for line in lines:
+                match = transaction_pattern.match(line.strip())
+                if match:
+                    date = match.group(1)
+                    description = match.group(2).strip()
+                    balance = match.group(3)
+
+                    # Create the dictionary entry matching the target CSV format
+                    # with hardcoded empty strings for Debit and Credit amounts.
+                    record = {
+                        'Date': date,
+                        'Description': description,
+                        'Debit Amt': "",
+                        'Credit Amt': "",
+                        'Balance': balance,
+                    }
+                    transactions.append(record)
+
+    return transactions
+
+
+Test Output:
+SUCCESS: The generated parser produced the correct data structure.
+
+================================================================================
