@@ -14,7 +14,7 @@ The agent operates in a self-correction loop. It begins by reading a sample PDF 
 ┌───────────┐
 │  PLAN     │
 │ Generate  │
-│  LLM     │
+│  LLM      │
 └─────┬─────┘
       │
       ▼
